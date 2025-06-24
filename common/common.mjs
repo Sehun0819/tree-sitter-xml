@@ -287,9 +287,28 @@ export const rules = {
       '>'
     ),
 
+    // EntityValue: $ => choice(
+    //   entity_value($, '"'),
+    //   entity_value($, "'")
+    // ),
+
+    // Not consistent with https://cs.lmu.edu/~ray/notes/xmlgrammar/
+    // EntityTextDouble: _ => token(/[^<%&"]+/),
+    // EntityTextSingle: _ => token(/[^<%&']+/),
+
+    EntityTextDouble: _ => token(/[^%&"]+/),
+    EntityTextSingle: _ => token(/[^%&']+/),
     EntityValue: $ => choice(
-      entity_value($, '"'),
-      entity_value($, "'")
+      seq(
+        '"',
+        field('content', repeat(choice($.EntityTextDouble, $.PEReference, $._Reference))),
+        '"'
+      ),
+      seq(
+        "'",
+        field('content', repeat(choice($.EntityTextSingle, $.PEReference, $._Reference))),
+        "'"
+      )
     ),
 
     NDataDecl: $ => seq($._S, 'NDATA', $._S, ref($, $.Name)),
@@ -298,7 +317,8 @@ export const rules = {
       '<!',
       'NOTATION',
       $._S,
-      ref($, $.Name),
+      // ref($, $.Name), // Not consistent with XML grammar (https://cs.lmu.edu/~ray/notes/xmlgrammar/)
+      $.Name,
       $._S,
       choice($.ExternalID, $.PublicID),
       O($._S),
@@ -317,14 +337,28 @@ export const rules = {
 
     EntityRef: $ => seq('&', $.Name, ';'),
 
-    CharRef: _ => choice(
-      seq('&#', /[0-9]+/, ';'),
-      seq('&#x', /[0-9a-fA-F]+/, ';')
+    // CharRef: _ => choice(
+    //   seq('&#', /[0-9]+/, ';'),
+    //   seq('&#x', /[0-9a-fA-F]+/, ';')
+    // ),
+
+    CharRefDecimal: _ => token(/[0-9]+/),
+    CharRefHex: _ => token(/[0-9a-fA-F]+/),
+    CharRef: $ => choice(
+      seq('&#', $.CharRefDecimal, ';'),
+      seq('&#x', $.CharRefHex, ';')
     ),
 
+    // AttValue: $ => choice(
+    //   att_value($, '"'),
+    //   att_value($, "'")
+    // ),
+
+    QuotedTextDouble: _ => token(/[^<&"]+/),
+    QuotedTextSingle: _ => token(/[^<&']+/),
     AttValue: $ => choice(
-      att_value($, '"'),
-      att_value($, "'")
+      seq('"', repeat(choice($.QuotedTextDouble, $._Reference)), '"'),
+      seq("'", repeat(choice($.QuotedTextSingle, $._Reference)), "'")
     ),
 
     ExternalID: $ => choice(
@@ -336,14 +370,30 @@ export const rules = {
       seq(ref($, 'PUBLIC'), $._S, $.PubidLiteral)
     ),
 
+    // SystemLiteral: $ => choice(
+    //   seq('"', alias(/[^"]*/, $.URI), '"'),
+    //   seq("'", alias(/[^']*/, $.URI), "'")
+    // ),
+    URI: _ => token(/[^"']*/),
     SystemLiteral: $ => choice(
-      seq('"', alias(/[^"]*/, $.URI), '"'),
-      seq("'", alias(/[^']*/, $.URI), "'")
+      seq('"', $.URI, '"'),
+      seq("'", $.URI, "'")
     ),
 
-    PubidLiteral: _ => choice(
-      seq('"', pubid_char("'"), '"'),
-      seq("'", pubid_char(''), "'")
+    // PubidLiteral: _ => choice(
+    //   seq('"', pubid_char("'"), '"'),
+    //   seq("'", pubid_char(''), "'")
+    // ),
+
+    PubidTextDouble: _ => token(
+      /[ \r\nA-Za-z0-9\-'\(\)+,./:=?;!*#@$_%]+/
+    ),
+    PubidTextSingle: _ => token(
+      /[ \r\nA-Za-z0-9\-\(\)+,./:=?;!*#@$_%]+/
+    ),
+    PubidLiteral: $ => choice(
+      seq('"', field('content', repeat($.PubidTextDouble)), '"'),
+      seq("'", field('content', repeat($.PubidTextSingle)), "'")
     ),
 
     _VersionInfo: $ => seq(

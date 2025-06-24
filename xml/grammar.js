@@ -126,7 +126,8 @@ export default grammar({
 
     EmptyElemTag: $ => seq(
       '<',
-      alias($._start_tag_name, $.Name),
+      // alias($._start_tag_name, $.Name),
+      $._start_tag_name,
       c.rseq($._S, $.Attribute),
       O($._S),
       '/>'
@@ -136,17 +137,20 @@ export default grammar({
 
     STag: $ => seq(
       '<',
-      alias($._start_tag_name, $.Name),
+      // alias($._start_tag_name, $.Name),
+      $._start_tag_name,
       c.rseq($._S, $.Attribute),
       O($._S),
       '>'
     ),
 
-    ETag: $ => seq('</', alias($._end_tag_name, $.Name), O($._S), '>'),
+    // ETag: $ => seq('</', alias($._end_tag_name, $.Name), O($._S), '>'),
+    ETag: $ => seq('</', $._end_tag_name, O($._S), '>'),
 
     _ErroneousETag: $ => seq(
       '</',
-      alias($._erroneous_end_name, $.ERROR),
+      // alias($._erroneous_end_name, $.ERROR),
+      $._erroneous_end_name,
       O($._S),
       '>',
     ),
@@ -186,9 +190,13 @@ export default grammar({
 
     PseudoAtt: $ => seq($.Name, $._Eq, $.PseudoAttValue),
 
+    // PseudoAttValue: $ => choice(
+    //   c.att_value($, '"'),
+    //   c.att_value($, "'")
+    // ),
     PseudoAttValue: $ => choice(
-      c.att_value($, '"'),
-      c.att_value($, "'")
+      seq('"', repeat(choice($.QuotedTextDouble, $._Reference)), '"'),
+      seq("'", repeat(choice($.QuotedTextSingle, $._Reference)), "'")
     ),
 
     ...c.rules
