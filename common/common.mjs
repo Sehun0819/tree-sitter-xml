@@ -335,7 +335,8 @@ export const rules = {
 
     _Reference: $ => choice($.EntityRef, $.CharRef),
 
-    EntityRef: $ => seq('&', $.Name, ';'),
+    // EntityRef: $ => seq('&', $.Name, ';'),
+    EntityRef: $ => choice(seq('&', $.Name, ';'), '&lt;', '&gt;', '&amp;', '&apos;', '&quot;'),
 
     // CharRef: _ => choice(
     //   seq('&#', /[0-9]+/, ';'),
