@@ -49,7 +49,7 @@ export default grammar({
 
   rules: {
     document: $ => prec(2, seq(
-      O($._S),
+      // O($._S),
       O($.prolog),
       field('root', $.element),
       repeat($._Misc),
