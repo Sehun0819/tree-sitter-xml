@@ -177,12 +177,20 @@ export const rules = {
       '>'
     ),
 
+    // AttDef: $ => prec.right(seq(
+    //   $._S,
+    //   ref($, $.Name),
+    //   $._S,
+    //   $._AttType,
+    //   O(seq($._S, $.DefaultDecl))
+    // )),
     AttDef: $ => prec.right(seq(
       $._S,
       ref($, $.Name),
       $._S,
       $._AttType,
-      O(seq($._S, $.DefaultDecl))
+      $._S,
+      $.DefaultDecl,
     )),
 
     _AttType: $ => choice(
