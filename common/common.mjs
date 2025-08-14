@@ -137,12 +137,14 @@ export const rules = {
     ),
 
     children: $ => prec(1, seq(
-      $._choice,
+      // $._choice,
+      choice($._choice, $._seq),
       O(choice('?', '*', '+'))
     )),
 
     _cp: $ => prec.left(seq(
-      ref($, $.Name, $._choice),
+      // ref($, $.Name, $._choice),
+      ref($, $.Name, $._choice, $._seq),
       O(choice('?', '*', '+'))
     )),
 
@@ -150,9 +152,27 @@ export const rules = {
       '(',
       O($._S),
       $._cp,
+      rseq1(
+        O($._S),
+        '|',
+        O($._S),
+        $._cp
+      ),
       rseq(
         O($._S),
-        choice('|', ','),
+        $.PEReference,
+      ),
+      O($._S),
+      ')'
+    ),
+
+    _seq: $ => seq(
+      '(',
+      O($._S),
+      $._cp,
+      rseq(
+        O($._S),
+        ',',
         O($._S),
         $._cp
       ),
