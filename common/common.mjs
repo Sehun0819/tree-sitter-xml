@@ -286,7 +286,8 @@ export const rules = {
       '<!',
       'ENTITY',
       $._S,
-      ref($, $.Name),
+      // ref($, $.Name),
+      $.Name,
       $._S,
       choice(
         $.EntityValue,
