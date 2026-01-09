@@ -126,8 +126,7 @@ export default grammar({
 
     EmptyElemTag: $ => seq(
       '<',
-      // alias($._start_tag_name, $.Name),
-      $._start_tag_name,
+      alias($._start_tag_name, $.Name),
       c.rseq($._S, $.Attribute),
       O($._S),
       '/>'
@@ -137,20 +136,17 @@ export default grammar({
 
     STag: $ => seq(
       '<',
-      // alias($._start_tag_name, $.Name),
-      $._start_tag_name,
+      alias($._start_tag_name, $.Name),
       c.rseq($._S, $.Attribute),
       O($._S),
       '>'
     ),
 
-    // ETag: $ => seq('</', alias($._end_tag_name, $.Name), O($._S), '>'),
-    ETag: $ => seq('</', $._end_tag_name, O($._S), '>'),
+    ETag: $ => seq('</', alias($._end_tag_name, $.Name), O($._S), '>'),
 
     _ErroneousETag: $ => seq(
       '</',
-      // alias($._erroneous_end_name, $.ERROR),
-      $._erroneous_end_name,
+      alias($._erroneous_end_name, $.ERROR),
       O($._S),
       '>',
     ),
