@@ -61,8 +61,10 @@ export const str = (...choices) =>
  * @param {GrammarSymbols<any>} $
  * @param {RuleOrLiteral[]} choices
  */
+// export const ref = ($, ...choices) =>
+//   choice(...choices, $.PEReference);
 export const ref = ($, ...choices) =>
-  choice(...choices, $.PEReference);
+  choice(...choices);
 
 /** @param {RuleOrLiteral[]} rules */
 export const rseq = (...rules) => repeat(seq(...rules));
@@ -101,7 +103,7 @@ export const rules = {
       'ANY',
       $.Mixed,
       $.children,
-      $.PEReference
+      // $.PEReference
     ),
 
     Mixed: $ => choice(
@@ -116,10 +118,10 @@ export const rules = {
           ref($, $.Name),
         ),
         O($._S),
-        rseq(
-          $.PEReference,
-          O($._S)
-        ),
+        // rseq(
+        //   $.PEReference,
+        //   O($._S)
+        // ),
         ')',
         '*'
       ),
@@ -128,10 +130,10 @@ export const rules = {
         O($._S),
         ref($, '#PCDATA'),
         O($._S),
-        rseq(
-          $.PEReference,
-          O($._S)
-        ),
+        // rseq(
+        //   $.PEReference,
+        //   O($._S)
+        // ),
         ')'
       ))
     ),
@@ -158,10 +160,10 @@ export const rules = {
         O($._S),
         $._cp
       ),
-      rseq(
-        O($._S),
-        $.PEReference,
-      ),
+      // rseq(
+      //   O($._S),
+      //   $.PEReference,
+      // ),
       O($._S),
       ')'
     ),
@@ -176,10 +178,10 @@ export const rules = {
         O($._S),
         $._cp
       ),
-      rseq(
-        O($._S),
-        $.PEReference,
-      ),
+      // rseq(
+      //   O($._S),
+      //   $.PEReference,
+      // ),
       O($._S),
       ')'
     ),
@@ -189,10 +191,11 @@ export const rules = {
       'ATTLIST',
       $._S,
       ref($, $.Name),
-      repeat(choice(
-        $.AttDef,
-        seq($._S, $.PEReference)
-      )),
+      // repeat(choice(
+      //   $.AttDef,
+      //   seq($._S, $.PEReference)
+      // )),
+      repeat($.AttDef),
       O($._S),
       '>'
     ),
@@ -217,7 +220,7 @@ export const rules = {
       $.StringType,
       $.TokenizedType,
       $._EnumeratedType,
-      $.PEReference
+      // $.PEReference
     ),
 
     StringType: _ => 'CDATA',
@@ -274,7 +277,7 @@ export const rules = {
         O(seq('#FIXED', $._S)),
         $.AttValue
       ),
-      $.PEReference
+      // $.PEReference
     ),
 
     _EntityDecl: $ => choice(
@@ -286,8 +289,7 @@ export const rules = {
       '<!',
       'ENTITY',
       $._S,
-      // ref($, $.Name),
-      $.Name,
+      ref($, $.Name),
       $._S,
       choice(
         $.EntityValue,
@@ -346,8 +348,7 @@ export const rules = {
       '<!',
       'NOTATION',
       $._S,
-      // ref($, $.Name), // Not consistent with XML grammar (https://cs.lmu.edu/~ray/notes/xmlgrammar/)
-      $.Name,
+      ref($, $.Name),
       $._S,
       choice($.ExternalID, $.PublicID),
       O($._S),
